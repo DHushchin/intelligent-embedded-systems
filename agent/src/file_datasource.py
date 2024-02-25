@@ -19,7 +19,6 @@ class FileDatasource:
 
 
     def read(self) -> AggregatedData:
-        """Метод возвращает данные, полученные с датчиков"""
         try:
             accelerometer_data = self.read_data(self.accelerometer_file)
             gps_data = self.read_data(self.gps_file)
@@ -40,7 +39,6 @@ class FileDatasource:
 
 
     def startReading(self):
-        """Метод должен вызываться перед началом чтения данных"""
         self.accelerometer_file = open(self.accelerometer_filename, 'r')
         self.gps_file = open(self.gps_filename, 'r')
         self.parking_file = open(self.parking_filename, 'r')
@@ -61,8 +59,6 @@ class FileDatasource:
 
 
     def read_data(self, file: TextIO):
-        """Метод для чтения данных из файла с указанным типом"""
-
         line = file.readline()
         if not line:
             raise ValueError('End of file')
