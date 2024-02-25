@@ -20,15 +20,15 @@ class FileDatasource:
 
     def read(self) -> AggregatedData:
         try:
-            accelerometer_data = self.read_data(self.accelerometer_file)
-            gps_data = self.read_data(self.gps_file)
-            parking_data = self.read_data(self.parking_file)
+            accelerometer_data = self._read_data(self.accelerometer_file)
+            gps_data = self._read_data(self.gps_file)
+            parking_data = self._read_data(self.parking_file)
         except ValueError:
             self.stopReading()
             self.startReading()
-            accelerometer_data = self.read_data(self.accelerometer_file)
-            gps_data = self.read_data(self.gps_file)
-            parking_data = self.read_data(self.parking_file)
+            accelerometer_data = self._read_data(self.accelerometer_file)
+            gps_data = self._read_data(self.gps_file)
+            parking_data = self._read_data(self.parking_file)
 
         return AggregatedData(
             Accelerometer(x=accelerometer_data[0], y=accelerometer_data[1], z=accelerometer_data[2]),
@@ -49,7 +49,6 @@ class FileDatasource:
 
 
     def stopReading(self):
-        """Метод должен вызываться для завершения чтения данных"""
         if self.accelerometer_file:
             self.accelerometer_file.close()
         if self.gps_file:
@@ -58,7 +57,7 @@ class FileDatasource:
             self.parking_file.close()
 
 
-    def read_data(self, file: TextIO):
+    def _read_data(self, file: TextIO):
         line = file.readline()
         if not line:
             raise ValueError('End of file')
