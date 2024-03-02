@@ -330,3 +330,21 @@
 1708888902: New client connected from 172.18.0.3:38371 as auto-F28D5CBD-E14F-34C9-E96A-A5395079CBA8 (p2, c1, k60).
 1708888902: New connection from 192.168.65.1:44750 on port 1883.
 1708888902: New client connected from 192.168.65.1:44750 as mqtt-explorer-b883aad0 (p2, c1, k60).
+1708893757: mosquitto version 2.0.18 starting
+1708893757: Config loaded from /mosquitto/config/mosquitto.conf.
+1708893757: Opening ipv4 listen socket on port 1883.
+1708893757: Opening ipv6 listen socket on port 1883.
+1708893757: mosquitto version 2.0.18 running
+1708893757: New connection from 192.168.65.1:19544 on port 1883.
+1708893757: New client connected from 192.168.65.1:19544 as mqtt-explorer-b883aad0 (p2, c1, k60).
+1708893757: New connection from 172.18.0.3:42493 on port 1883.
+1708893757: New client connected from 172.18.0.3:42493 as auto-E566ABDC-324E-72D1-C4E0-52FA7C412EFD (p2, c1, k60).
+1708894027: mosquitto version 2.0.18 starting
+1708894027: Config loaded from /mosquitto/config/mosquitto.conf.
+1708894027: Opening ipv4 listen socket on port 1883.
+1708894027: Opening ipv6 listen socket on port 1883.
+1708894027: mosquitto version 2.0.18 running
+1708894027: New connection from 172.18.0.3:34105 on port 1883.
+1708894027: New client connected from 172.18.0.3:34105 as auto-EDA7CEEC-76C4-CCA9-BEFF-D67E1CC273C6 (p2, c1, k60).
+1708894028: New connection from 192.168.65.1:19623 on port 1883.
+1708894028: New client connected from 192.168.65.1:19623 as mqtt-explorer-b883aad0 (p2, c1, k60).
