@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel, field_validator, Field
 from datetime import datetime
 
 
@@ -12,7 +12,7 @@ class AccelerometerData(BaseModel):
 class GpsData(BaseModel):
     latitude: float
     longitude: float
-
+    timestamp: datetime = Field(..., title="Timestamp", description="Timestamp of the data")
 
 class AgentData(BaseModel):
     accelerometer: AccelerometerData

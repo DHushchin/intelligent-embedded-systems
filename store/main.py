@@ -1,28 +1,9 @@
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Float, DateTime
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from models import ProcessedAgentData, ProcessedAgentDataInDB
+from db import engine, processed_agent_data
 from typing import List, Set
 import json
-from models import ProcessedAgentData, ProcessedAgentDataInDB
-from config import POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT, POSTGRES_DB
 
-# SQLAlchemy setup
-DATABASE_URL =f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
-engine = create_engine(DATABASE_URL)
-metadata = MetaData()
-
-# Define the ProcessedAgentData table
-processed_agent_data = Table(
-    "processed_agent_data",
-    metadata,
-    Column("id", Integer, primary_key=True, index=True),
-    Column("road_state", String),
-    Column("x", Float),
-    Column("y", Float),
-    Column("z", Float),
-    Column("latitude", Float),
-    Column("longitude", Float),
-    Column("timestamp", DateTime),
-)
 
 # FastAPI app setup
 app = FastAPI()
@@ -50,69 +31,43 @@ async def send_data_to_subscribers(data):
 
 
 # FastAPI CRUDL endpoints
-@app.post("/processed_agent_data/")
+@app.post("/processed_agent_data/", response_model=List[ProcessedAgentDataInDB])
 async def create_processed_agent_data(data: List[ProcessedAgentData]):
-    # Convert ProcessedAgentData objects to dictionaries
-    data_dicts = [row.dict() for row in data]
-
-    # Insert data to database
     conn = engine.connect()
-    conn.execute(processed_agent_data.insert(), data_dicts)
+    return_data = []
+    for item in data:
+        stmt = processed_agent_data.insert().values(
+            road_state=item.road_state,
+            x=item.agent_data.accelerometer.x,
+            y=item.agent_data.accelerometer.y,
+            z=item.agent_data.accelerometer.z,
+            latitude=item.agent_data.gps.latitude,
+            longitude=item.agent_data.gps.longitude,
+            timestamp=item.agent_data.timestamp
+        )
+        result = conn.execute(stmt)
+        conn.commit()
+        returned_id = result.inserted_primary_key[0]
+        returned_item = ProcessedAgentDataInDB(
+            id=returned_id,
+            road_state=item.road_state,
+            x=item.agent_data.accelerometer.x,
+            y=item.agent_data.accelerometer.y,
+            z=item.agent_data.accelerometer.z,
+            latitude=item.agent_data.gps.latitude,
+            longitude=item.agent_data.gps.longitude,
+            timestamp=item.agent_data.timestamp
+        )
+        return_data.append(returned_item)
+        await send_data_to_subscribers(returned_item.model_dump())
     conn.close()
-
-    # Send data to subscribers
-    await send_data_to_subscribers(data_dicts)
-
-    return {"message": "Data inserted successfully"}
-
-
-@app.get("/processed_agent_data/{processed_agent_data_id}", response_model=ProcessedAgentDataInDB)
-def read_processed_agent_data(processed_agent_data_id: int):
-    # Get data by id
-    conn = engine.connect()
-    query = processed_agent_data.select().where(processed_agent_data.c.id == processed_agent_data_id)
-    result = conn.execute(query)
-    data = result.fetchone()
-    conn.close()
-    return data
+    return return_data
 
 
 @app.get("/processed_agent_data/", response_model=List[ProcessedAgentDataInDB])
 def list_processed_agent_data():
-    # Get list of data
-    conn = engine.connect()
-    query = processed_agent_data.select()
-    result = conn.execute(query)
-    data = result.fetchall()
-    conn.close()
-    return data
+    pass
 
-
-@app.put("/processed_agent_data/{processed_agent_data_id}", response_model=ProcessedAgentDataInDB)
-def update_processed_agent_data(processed_agent_data_id: int, data: ProcessedAgentData):
-    # Convert ProcessedAgentData object to dictionary
-    data_dict = data.dict(exclude_unset=True)
-
-    # Update data
-    conn = engine.connect()
-    query = (
-        processed_agent_data.update()
-        .where(processed_agent_data.c.id == processed_agent_data_id)
-        .values(**data_dict)
-    )
-    conn.execute(query)
-    conn.close()
-    return {"message": "Data updated successfully"}
-
-
-@app.delete("/processed_agent_data/{processed_agent_data_id}", response_model=ProcessedAgentDataInDB)
-def delete_processed_agent_data(processed_agent_data_id: int):
-    # Delete by id
-    conn = engine.connect()
-    query = processed_agent_data.delete().where(processed_agent_data.c.id == processed_agent_data_id)
-    conn.execute(query)
-    conn.close()
-    return {"message": "Data deleted successfully"}
 
 
 if __name__ == "__main__":
