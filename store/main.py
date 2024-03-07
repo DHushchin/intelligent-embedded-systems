@@ -66,8 +66,84 @@ async def create_processed_agent_data(data: List[ProcessedAgentData]):
 
 @app.get("/processed_agent_data/", response_model=List[ProcessedAgentDataInDB])
 def list_processed_agent_data():
-    pass
+    conn = engine.connect()
+    stmt = processed_agent_data.select()
+    result = conn.execute(stmt)
 
+    return_data = []
+    for item in result:
+        return_data.append(ProcessedAgentDataInDB(
+            id=item.id,
+            road_state=item.road_state,
+            x=item.x,
+            y=item.y,
+            z=item.z,
+            latitude=item.latitude,
+            longitude=item.longitude,
+            timestamp=item.timestamp
+        ))
+    conn.close()
+
+    return return_data
+
+
+@app.get("/processed_agent_data/{processed_agent_data_id}", response_model=ProcessedAgentDataInDB)
+def read_processed_agent_data(processed_agent_data_id: int):
+    conn = engine.connect()
+    stmt = processed_agent_data.select().where(processed_agent_data.c.id == processed_agent_data_id)
+    result = conn.execute(stmt)
+    item = result.first()
+    return_data = ProcessedAgentDataInDB(
+        id=item.id,
+        road_state=item.road_state,
+        x=item.x,
+        y=item.y,
+        z=item.z,
+        latitude=item.latitude,
+        longitude=item.longitude,
+        timestamp=item.timestamp
+    )
+    conn.close()
+    return return_data
+
+
+@app.put("/processed_agent_data/{processed_agent_data_id}", response_model=ProcessedAgentDataInDB)
+def update_processed_agent_data(processed_agent_data_id: int, data: ProcessedAgentData):
+    conn = engine.connect()
+    stmt = processed_agent_data.update().where(processed_agent_data.c.id == processed_agent_data_id).values(
+        road_state=data.road_state,
+        x=data.agent_data.accelerometer.x,
+        y=data.agent_data.accelerometer.y,
+        z=data.agent_data.accelerometer.z,
+        latitude=data.agent_data.gps.latitude,
+        longitude=data.agent_data.gps.longitude,
+        timestamp=data.agent_data.timestamp
+    )
+    result = conn.execute(stmt)
+    conn.commit()
+    conn.close()
+    return_data = ProcessedAgentDataInDB(
+        id=processed_agent_data_id,
+        road_state=data.road_state,
+        x=data.agent_data.accelerometer.x,
+        y=data.agent_data.accelerometer.y,
+        z=data.agent_data.accelerometer.z,
+        latitude=data.agent_data.gps.latitude,
+        longitude=data.agent_data.gps.longitude,
+        timestamp=data.agent_data.timestamp
+    )
+    return return_data
+
+
+@app.delete("/processed_agent_data/{processed_agent_data_id}", response_model=ProcessedAgentDataInDB)
+def delete_processed_agent_data(processed_agent_data_id: int):
+    conn = engine.connect()
+    return_data = read_processed_agent_data(processed_agent_data_id)
+    stmt = processed_agent_data.delete().where(processed_agent_data.c.id == processed_agent_data_id)
+    result = conn.execute(stmt)
+    conn.commit()
+    conn.close()
+    return return_data
 
 
 if __name__ == "__main__":
