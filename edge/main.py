@@ -30,6 +30,8 @@ def main():
         topic=HUB_MQTT_TOPIC,
     )
 
+    # hub_adapter = HubHttpAdapter(HUB_URL)
+
     # Create an instance of the AgentMQTTAdapter using the configuration
     agent_adapter = AgentMQTTAdapter(
         broker_host=MQTT_BROKER_HOST,

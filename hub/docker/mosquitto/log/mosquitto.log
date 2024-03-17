@@ -1,0 +1,8 @@
+1710627152: mosquitto version 2.0.18 starting
+1710627152: Config loaded from /mosquitto/config/mosquitto.conf.
+1710627152: Opening ipv4 listen socket on port 1883.
+1710627152: Opening ipv6 listen socket on port 1883.
+1710627152: mosquitto version 2.0.18 running
+1710627154: New connection from 192.168.16.3:56011 on port 1883.
+1710627154: New client connected from 192.168.16.3:56011 as auto-651ABD1B-B25B-123F-4F61-F94B48A31F0C (p2, c1, k60).
+1710627163: Client auto-651ABD1B-B25B-123F-4F61-F94B48A31F0C closed its connection.

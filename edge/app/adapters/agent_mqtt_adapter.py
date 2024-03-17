@@ -1,9 +1,21 @@
 import logging
 import paho.mqtt.client as mqtt
 from app.interfaces.agent_gateway import AgentGateway
-from app.entities.agent_data import AgentData, GpsData
+from app.entities.agent_data import AgentData
 from app.usecases.data_processing import process_agent_data
 from app.interfaces.hub_gateway import HubGateway
+from app.adapters.hub_http_adapter import HubHttpAdapter
+from app.adapters.hub_mqtt_adapter import HubMQTTAdapter
+from config import (
+    MQTT_BROKER_HOST,
+    MQTT_BROKER_PORT,
+    MQTT_TOPIC,
+    HUB_MQTT_BROKER_HOST,
+    HUB_MQTT_BROKER_PORT,
+    HUB_MQTT_TOPIC,
+    HUB_URL,
+
+)
 
 
 class AgentMQTTAdapter(AgentGateway):
@@ -35,10 +47,13 @@ class AgentMQTTAdapter(AgentGateway):
         """Processing agent data and sent it to hub gateway"""
         try:
             payload: str = msg.payload.decode("utf-8")
+
             # Create AgentData instance with the received data
             agent_data = AgentData.model_validate_json(payload, strict=True)
+
             # Process the received data (you can call a use case here if needed)
             processed_data = process_agent_data(agent_data)
+            
             # Store the agent_data in the database (you can send it to the data processing module)
             if not self.hub_gateway.save_data(processed_data):
                 logging.error("Hub is not available")
@@ -62,7 +77,8 @@ if __name__ == "__main__":
     broker_port = 1883
     topic = "agent_data_topic"
     # Assuming you have implemented the StoreGateway and passed it to the adapter
-    store_gateway = HubGateway()
+    store_gateway = HubHttpAdapter(HUB_URL)
+    # store_gateway = HubMQTTAdapter(HUB_MQTT_BROKER_HOST, HUB_MQTT_BROKER_PORT, HUB_MQTT_TOPIC)
     adapter = AgentMQTTAdapter(broker_host, broker_port, topic, store_gateway)
     adapter.connect()
     adapter.start()
