@@ -14,6 +14,7 @@ class GpsData(BaseModel):
     longitude: float
     timestamp: datetime = Field(..., title="Timestamp", description="Timestamp of the data")
 
+
 class AgentData(BaseModel):
     accelerometer: AccelerometerData
     gps: GpsData

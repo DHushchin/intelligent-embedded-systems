@@ -55,7 +55,7 @@ services:
 
   store:
     container_name: store
-    build: ../store
+    build: ../../store
     depends_on:
       - postgres_db
     restart: always
@@ -74,7 +74,7 @@ services:
 
   edge:
     container_name: edge
-    build: ../edge
+    build: ../
     depends_on:
       - mqtt
       - hub
@@ -93,7 +93,7 @@ services:
 
   hub:
     container_name: hub
-    build: ../hub
+    build: ../../hub
     depends_on:
       - mqtt
       - redis
@@ -115,7 +115,7 @@ services:
 
   fake_agent:
     container_name: agent
-    build: ../agent
+    build: ../../agent
     depends_on:
       - mqtt
     environment:

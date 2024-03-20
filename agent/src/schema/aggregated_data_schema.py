@@ -7,6 +7,6 @@ from domain.aggregated_data import AggregatedData
 class AggregatedDataSchema(Schema):
     accelerometer = fields.Nested(AccelerometerSchema)
     gps = fields.Nested(GpsSchema)
-    parking = fields.Nested(ParkingSchema)
-    time = fields.DateTime('iso')
+    # parking = fields.Nested(ParkingSchema)
+    timestamp = fields.DateTime('iso')
     

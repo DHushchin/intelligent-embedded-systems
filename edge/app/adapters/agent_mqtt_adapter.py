@@ -5,7 +5,8 @@ from app.entities.agent_data import AgentData
 from app.usecases.data_processing import process_agent_data
 from app.interfaces.hub_gateway import HubGateway
 from app.adapters.hub_http_adapter import HubHttpAdapter
-from app.adapters.hub_mqtt_adapter import HubMQTTAdapter
+from app.adapters.hub_mqtt_adapter import HubMqttAdapter
+
 from config import (
     MQTT_BROKER_HOST,
     MQTT_BROKER_PORT,
@@ -14,7 +15,6 @@ from config import (
     HUB_MQTT_BROKER_PORT,
     HUB_MQTT_TOPIC,
     HUB_URL,
-
 )
 
 
@@ -46,14 +46,17 @@ class AgentMQTTAdapter(AgentGateway):
     def on_message(self, client, userdata, msg):
         """Processing agent data and sent it to hub gateway"""
         try:
+            logging.info("Received message")
             payload: str = msg.payload.decode("utf-8")
-
+            logging.info("Payload: received ")
+            logging.info(payload)
             # Create AgentData instance with the received data
             agent_data = AgentData.model_validate_json(payload, strict=True)
 
+            logging.info("Agent data validated")
             # Process the received data (you can call a use case here if needed)
             processed_data = process_agent_data(agent_data)
-            
+            logging.info("Agent data processed")
             # Store the agent_data in the database (you can send it to the data processing module)
             if not self.hub_gateway.save_data(processed_data):
                 logging.error("Hub is not available")
