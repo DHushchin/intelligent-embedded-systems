@@ -18,7 +18,7 @@ class GpsData(BaseModel):
 class AgentData(BaseModel):
     accelerometer: AccelerometerData
     gps: GpsData
-    timestamp: datetime
+    timestamp: datetime = Field(..., title="Timestamp", description="Timestamp of the data")
 
     @classmethod
     @field_validator('timestamp', mode='before')

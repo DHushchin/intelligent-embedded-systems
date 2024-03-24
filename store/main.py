@@ -3,6 +3,7 @@ from models import ProcessedAgentData, ProcessedAgentDataInDB
 from db import engine, processed_agent_data
 from typing import List, Set
 import json
+import logging
 
 
 # FastAPI app setup
@@ -45,9 +46,11 @@ async def create_processed_agent_data(data: List[ProcessedAgentData]):
             longitude=item.agent_data.gps.longitude,
             timestamp=item.agent_data.timestamp
         )
+
         result = conn.execute(stmt)
         conn.commit()
         returned_id = result.inserted_primary_key[0]
+
         returned_item = ProcessedAgentDataInDB(
             id=returned_id,
             road_state=item.road_state,
@@ -58,9 +61,12 @@ async def create_processed_agent_data(data: List[ProcessedAgentData]):
             longitude=item.agent_data.gps.longitude,
             timestamp=item.agent_data.timestamp
         )
+
         return_data.append(returned_item)
         await send_data_to_subscribers(returned_item.model_dump())
+
     conn.close()
+    logging.info("Data created successfully")
     return return_data
 
 
@@ -104,6 +110,7 @@ def read_processed_agent_data(processed_agent_data_id: int):
         timestamp=item.timestamp
     )
     conn.close()
+
     return return_data
 
 
@@ -119,9 +126,11 @@ def update_processed_agent_data(processed_agent_data_id: int, data: ProcessedAge
         longitude=data.agent_data.gps.longitude,
         timestamp=data.agent_data.timestamp
     )
+
     result = conn.execute(stmt)
     conn.commit()
     conn.close()
+
     return_data = ProcessedAgentDataInDB(
         id=processed_agent_data_id,
         road_state=data.road_state,
@@ -132,6 +141,7 @@ def update_processed_agent_data(processed_agent_data_id: int, data: ProcessedAge
         longitude=data.agent_data.gps.longitude,
         timestamp=data.agent_data.timestamp
     )
+
     return return_data
 
 
@@ -143,6 +153,7 @@ def delete_processed_agent_data(processed_agent_data_id: int):
     result = conn.execute(stmt)
     conn.commit()
     conn.close()
+    
     return return_data
 
 

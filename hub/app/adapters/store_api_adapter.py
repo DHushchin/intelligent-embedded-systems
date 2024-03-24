@@ -2,7 +2,6 @@ import json
 import logging
 from typing import List
 
-import pydantic_core
 import requests
 
 from app.entities.processed_agent_data import ProcessedAgentData
@@ -21,15 +20,13 @@ class StoreApiAdapter(StoreGateway):
         Returns:
             bool: True if the data is successfully saved, False otherwise.
         """
-        # Convert the processed road data to a dictionary.
-        processed_agent_data_batch_dict = pydantic_core.parse_obj_as(
-            List[dict], processed_agent_data_batch
+        processed_agent_data_json_batch = json.dumps(
+            [processed_agent_data.model_dump(mode='json') for processed_agent_data in processed_agent_data_batch]
         )
 
-        # Send a POST request to the Store API to save the processed road data.
         response = requests.post(
-            f"{self.api_base_url}/processed-agent-data",
-            json=processed_agent_data_batch_dict,
+            f"{self.api_base_url}/processed_agent_data/",
+            data=processed_agent_data_json_batch,
         )
 
         if response.status_code in [200, 201]:

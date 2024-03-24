@@ -12,7 +12,7 @@ from config import (
     HUB_MQTT_TOPIC,
 )
 
-def main():
+if __name__ == "__main__":
     # Configure logging settings
     logging.basicConfig(
         level=logging.INFO,  # Set the log level to INFO (you can use logging.DEBUG for more detailed logs)
@@ -22,16 +22,15 @@ def main():
             logging.FileHandler("app.log"),  # Save log messages to a file
         ],
     )
-
     # Create an instance of the StoreApiAdapter using the configuration
-    # hub_adapter = HubMqttAdapter(
-    #     broker=HUB_MQTT_BROKER_HOST,
-    #     port=HUB_MQTT_BROKER_PORT,
-    #     topic=HUB_MQTT_TOPIC,
+    # hub_adapter = HubHttpAdapter(
+    #     api_base_url=HUB_URL,
     # )
-
-    hub_adapter = HubHttpAdapter(HUB_URL)
-
+    hub_adapter = HubMqttAdapter(
+        broker=HUB_MQTT_BROKER_HOST,
+        port=HUB_MQTT_BROKER_PORT,
+        topic=HUB_MQTT_TOPIC,
+    )
     # Create an instance of the AgentMQTTAdapter using the configuration
     agent_adapter = AgentMQTTAdapter(
         broker_host=MQTT_BROKER_HOST,
@@ -39,7 +38,6 @@ def main():
         topic=MQTT_TOPIC,
         hub_gateway=hub_adapter,
     )
-
     try:
         # Connect to the MQTT broker and start listening for messages
         agent_adapter.connect()
@@ -51,7 +49,3 @@ def main():
         # Stop the MQTT adapter and exit gracefully if interrupted by the user
         agent_adapter.stop()
         logging.info("System stopped.")
-
-if __name__ == "__main__":
-    main()
-    

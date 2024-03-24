@@ -21,3 +21,6 @@ processed_agent_data = Table(
     Column("timestamp", DateTime),
 )
 
+# Create the table
+metadata.create_all(engine)
+

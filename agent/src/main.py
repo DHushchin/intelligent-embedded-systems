@@ -37,7 +37,7 @@ def publish(client, topic, datasource, delay):
 
         if status == 0:
             pass
-            print(f"Send `{msg}` to topic `{topic}`")
+            #print(f"Send `{msg}` to topic `{topic}`")
         else:
             print(f"Failed to send message to topic {topic}")
 

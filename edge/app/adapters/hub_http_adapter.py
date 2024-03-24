@@ -19,12 +19,12 @@ class HubHttpAdapter(HubGateway):
             bool: True if the data is successfully saved, False otherwise.
         """
         url = f"{self.api_base_url}/processed_agent_data/"
-
         response = requests.post(url, data=processed_data.model_dump_json())
         if response.status_code != 200:
             logging.info(
                 f"Invalid Hub response\nData: {processed_data.model_dump_json()}\nResponse: {response}"
             )
             return False
+        logging.info("Data saved to Hub")
         return True
     
